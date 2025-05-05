@@ -1,0 +1,121 @@
+1.
+🌐 Overview
+This web-based platform is designed to manage all aspects of apartment rental operations,
+including apartment listings, contract creation, invoice generation, tenant payments,
+maintenance billing, expenses, and staff payroll. The platform supports yearly rental contracts,
+automates invoice creation, and allows flexible cost attribution for maintenance and other
+operational expenses.
+2.
+👥 User Roles
+●​ System Administrator: Full access to manage apartments, tenants, contracts, invoices,
+payments, expenses, maintenance, and employee salaries.​
+●​ (Optional for future phases: Accountant, Maintenance Manager, etc.)​
+3.
+📂 Core Modules & Features
+3.1
+🏘️ Apartment Management
+●​ Add/edit/delete apartment entries.​
+●​ Store metadata:​
+○​ Level/Floor​
+○​ Location​
+○​ Number of Rooms​
+○​ Amenities (e.g., air conditioning, elevator access, parking)​
+○​ Status (Available, Occupied, Under Maintenance)​
+●​ View list of all apartments with filters (status, floor, location, etc.)​3.2
+📝 Contract Management
+●​ Create new rental contract:​
+○​ Select an available apartment​
+○​ Input tenant details (Name, Phone Number, ID image upload)​
+○​ Upload scanned contract file (PDF, image)​
+○​ Set contract duration (years)​
+○​ Define payment frequency (e.g., yearly, bi-annually, quarterly)​
+●​ Upon saving:​
+○​ Apartment status changes to “Occupied”​
+○​ System auto-generates invoices based on contract terms​
+3.3
+📄 Invoice Management
+●​ View all invoices (by tenant, by apartment, by status)​
+●​ Invoices generated per contract (based on years & payment frequency)​
+●​ Invoices marked as:​
+○​ Paid​
+○​ Unpaid​
+○​ Partially Paid​
+●​ Filter/sort by due date, tenant, apartment, status​
+3.4
+💵 Receipt & Payment Management●​ Record tenant payments against invoices​
+●​ Generate and print/download payment receipts​
+●​ Maintain full payment history per tenant​
+3.5
+🛠️ Maintenance & Repair Management
+●​ Create maintenance requests/invoices:​
+○​ Link to specific apartment​
+○​ Add service provider/company details​
+○​ Cost and description of work​
+○​ Attach invoice file (PDF/image)​
+●​ Payment Status:​
+○​ Paid by Owner​
+○​ Pending​
+●​ Option to bill the tenant for maintenance:​
+○​ If selected, the system generates a new invoice for the tenant linked to the
+original maintenance expense​
+3.6
+💳 Categorized Expense Management
+●​ Declare and manage operational expenses:​
+○​ Utilities, Internet, Marketing, Taxes, etc.​
+●​ Assign expense to category and apartment (if applicable)​
+●​ View reports of expenses by category, apartment, or time period​3.7
+👷 Employee & Salary Management
+●​ Register employees:​
+○​ Role (Security, Gate Keeper, Cleaner, etc.)​
+○​ Personal info and salary amount​
+●​ Generate and track monthly salaries​
+●​ Optional: export payroll reports​
+4.
+🔄 Workflow
+📌 Step-by-Step Process
+1.​ Add Apartment​
+○​ Admin creates apartment records with all details.​
+2.​ Create Contract​
+○​ Admin selects an available apartment.​
+○​ Enters tenant info and contract terms.​
+○​ System marks the apartment as Occupied.​
+○​ System generates a series of invoices based on payment schedule.​
+3.​ Invoices & Payments​
+○​ Admin views all upcoming and overdue invoices.​
+○​ When tenant pays, admin records payment and generates a receipt.​
+○​ System updates invoice status.​4.​ Maintenance​
+○​ Admin logs a maintenance job.​
+○​ Adds whether tenant should be billed.​
+■​ If yes → system creates new invoice under tenant account.​
+○​ Payment to vendor is tracked separately.​
+5.​ Expenses​
+○​ Admin adds recurring or one-time business expenses.​
+○​ Categorizes them for reporting (utilities, cleaning, etc.)​
+6.​ Employee Payroll​
+○​ Admin adds staff.​
+○​ Records and tracks salary payments monthly.​
+5.
+📊 Reporting & Dashboards
+●​ Apartments Overview: occupancy rate, available vs. rented​
+●​ Tenant Management: active tenants, overdue invoices​
+●​ Financial Reports:​
+○​ Total Income (rent)​
+○​ Total Expenses (maintenance, salaries, utilities)​
+○​ Net Profit by period​
+●​ Maintenance Tracking: frequency, cost per apartment​
+●​ Salaries & Payroll Reports​●​ Export options: PDF, Excel​
+6.
+🛠 Technical Notes
+●​ Web-based Interface​
+●​ Role-Based Access​
+●​ Secure File Uploads (ID, contracts, invoices)​
+●​ Printable Receipts & Invoices​
+●​ Multi-language Ready (optional)​
+●​ Responsive Design for desktop and mobile​
+7.
+🔮 Optional Future Features
+●​ Tenant Portal (to view invoices, pay online)​
+●​ SMS/Email Notifications (payment reminders, contract renewal)​
+●​ Online contract signing​
+●​ Maintenance calendar & task scheduling​
+●​ Analytics with graphs and charts
