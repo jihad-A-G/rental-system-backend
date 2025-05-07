@@ -11,6 +11,7 @@ import {
 import { protect, adminOnly } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validation.middleware';
 import { maintenanceValidation } from '../validations/maintenance.validation';
+import { handleMaintenanceUploads } from '../middleware/upload.middleware';
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.use(protect);
 
 router.route('/')
   .get(getMaintenanceRequests)
-  .post(adminOnly, validate(maintenanceValidation.create), createMaintenanceRequest);
+  .post(adminOnly, handleMaintenanceUploads, validate(maintenanceValidation.create), createMaintenanceRequest);
 
 router.route('/:id')
   .get(getMaintenanceRequest)
@@ -27,7 +28,7 @@ router.route('/:id')
   .delete(adminOnly, deleteMaintenanceRequest);
 
 router.route('/:id/upload')
-  .put(adminOnly, uploadMaintenanceInvoice);
+  .put(adminOnly, handleMaintenanceUploads, uploadMaintenanceInvoice);
 
 router.route('/apartment/:apartmentId')
   .get(getMaintenanceByApartment);

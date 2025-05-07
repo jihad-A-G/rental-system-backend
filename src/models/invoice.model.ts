@@ -3,6 +3,9 @@ import { IContract } from './contract.model';
 
 export interface IInvoice extends mongoose.Document {
   contract: mongoose.Types.ObjectId | IContract;
+  tenantName: string;
+  tenantPhone: string;
+  apartmentId: mongoose.Types.ObjectId;
   invoiceNumber: string;
   amount: number;
   dueDate: Date;
@@ -18,6 +21,19 @@ const InvoiceSchema = new mongoose.Schema({
   contract: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Contract',
+    required: true
+  },
+  tenantName: {
+    type: String,
+    required: [true, 'Tenant name is required']
+  },
+  tenantPhone: {
+    type: String,
+    required: [true, 'Tenant phone is required']
+  },
+  apartmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Apartment',
     required: true
   },
   invoiceNumber: {

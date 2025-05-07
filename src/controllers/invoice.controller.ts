@@ -27,11 +27,11 @@ export const getInvoices = async (req: Request, res: Response, next: NextFunctio
     let query = Invoice.find(JSON.parse(queryStr))
       .populate({
         path: 'contract',
-        select: 'tenant.name tenant.phone startDate endDate',
-        populate: {
-          path: 'apartment',
-          select: 'number location level'
-        }
+        select: 'startDate endDate'
+      })
+      .populate({
+        path: 'apartmentId',
+        select: 'number location level'
       });
 
     // Select Fields
@@ -96,11 +96,11 @@ export const getInvoice = async (req: Request, res: Response, next: NextFunction
     const invoice = await Invoice.findById(req.params.id)
       .populate({
         path: 'contract',
-        select: 'tenant.name tenant.phone startDate endDate apartment',
-        populate: {
-          path: 'apartment',
-          select: 'number location level'
-        }
+        select: 'startDate endDate'
+      })
+      .populate({
+        path: 'apartmentId',
+        select: 'number location level'
       })
       .populate('payments');
 
@@ -125,7 +125,7 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
     const { contract: contractId } = req.body;
 
     // Check if contract exists
-    const contract = await Contract.findById(contractId);
+    const contract = await Contract.findById(contractId).populate('apartment');
 
     if (!contract) {
       return next(new ErrorResponse(`Contract not found with id of ${contractId}`, 404));
@@ -133,6 +133,11 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
 
     // Generate invoice number
     req.body.invoiceNumber = `INV-${Date.now()}`;
+    
+    // Add tenant and apartment info
+    req.body.tenantName = contract.tenant.name;
+    req.body.tenantPhone = contract.tenant.phone;
+    req.body.apartmentId = contract.apartment._id;
 
     const invoice = await Invoice.create(req.body);
 
@@ -150,28 +155,46 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
 // @access  Private
 export const updateInvoice = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Don't allow updating contract after creation
-    if (req.body.contract) {
-      return next(new ErrorResponse('Cannot change contract for an existing invoice', 400));
-    }
-
     // Don't allow updating invoice number
     if (req.body.invoiceNumber) {
       return next(new ErrorResponse('Cannot change invoice number', 400));
     }
 
-    const invoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, {
+    // Fetch the current invoice to get the amount
+    const invoice = await Invoice.findById(req.params.id);
+    if (!invoice) {
+      return next(new ErrorResponse(`Invoice not found with id of ${req.params.id}`, 404));
+    }
+
+    // If paidAmount is being updated, recalculate status
+    let updateData = { ...req.body };
+    if (typeof req.body.paidAmount === 'number') {
+      const paidAmount = req.body.paidAmount;
+      const amount = typeof req.body.amount === 'number' ? req.body.amount : invoice.amount;
+      let status = invoice.status;
+      if (paidAmount <= 0) {
+        status = 'Unpaid';
+      } else if (paidAmount >= amount) {
+        status = 'Paid';
+      } else {
+        status = 'Partially Paid';
+      }
+      updateData.status = status;
+    }
+
+    // Update the invoice
+    const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true
     });
 
-    if (!invoice) {
+    if (!updatedInvoice) {
       return next(new ErrorResponse(`Invoice not found with id of ${req.params.id}`, 404));
     }
 
     res.status(200).json({
       success: true,
-      data: invoice
+      data: updatedInvoice
     });
   } catch (error) {
     next(error);
@@ -210,22 +233,14 @@ export const deleteInvoice = async (req: Request, res: Response, next: NextFunct
 // @access  Private
 export const getInvoicesByApartment = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const contracts = await Contract.find({ apartment: req.params.apartmentId });
-    
-    if (contracts.length === 0) {
-      return next(new ErrorResponse(`No contracts found for apartment with id of ${req.params.apartmentId}`, 404));
-    }
-
-    const contractIds = contracts.map(contract => contract._id);
-    
-    const invoices = await Invoice.find({ contract: { $in: contractIds } })
+    const invoices = await Invoice.find({ apartmentId: req.params.apartmentId })
       .populate({
         path: 'contract',
-        select: 'tenant.name tenant.phone startDate endDate',
-        populate: {
-          path: 'apartment',
-          select: 'number location level'
-        }
+        select: 'startDate endDate'
+      })
+      .populate({
+        path: 'apartmentId',
+        select: 'number location level'
       })
       .sort('-dueDate');
 

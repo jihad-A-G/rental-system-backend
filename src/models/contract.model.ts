@@ -4,14 +4,14 @@ import { IApartment } from './apartment.model';
 export interface ITenant {
   name: string;
   phone: string;
-  idImagePath: string;
+  idImagePath?: string;
 }
 
 export interface IContract extends mongoose.Document {
   apartment: mongoose.Types.ObjectId | IApartment;
   tenant: ITenant;
-  contractFile: string;
-  duration: number; // in years
+  contractFile?: string;
+  duration: number; 
   paymentFrequency: 'yearly' | 'bi-annually' | 'quarterly' | 'monthly';
   startDate: Date;
   endDate: Date;
@@ -31,7 +31,7 @@ const TenantSchema = new mongoose.Schema({
   },
   idImagePath: {
     type: String,
-    required: [true, 'Please upload tenant ID']
+    required: false
   }
 });
 
@@ -44,7 +44,7 @@ const ContractSchema = new mongoose.Schema({
   tenant: TenantSchema,
   contractFile: {
     type: String,
-    required: [true, 'Please upload contract file']
+    required: false
   },
   duration: {
     type: Number,

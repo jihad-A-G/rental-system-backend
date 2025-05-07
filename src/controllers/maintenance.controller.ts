@@ -152,6 +152,9 @@ export const createMaintenanceRequest = async (req: Request, res: Response, next
         // Create tenant invoice
         const invoice = await Invoice.create({
           contract: contract._id,
+          tenantName: contract.tenant.name,
+          tenantPhone: contract.tenant.phone,
+          apartmentId: apartmentId,
           invoiceNumber: `INV-M-${Date.now()}`,
           amount: req.body.cost,
           dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Due in 14 days
@@ -213,6 +216,9 @@ export const updateMaintenanceRequest = async (req: Request, res: Response, next
       // Create tenant invoice
       const invoice = await Invoice.create({
         contract: contract._id,
+        tenantName: contract.tenant.name,
+        tenantPhone: contract.tenant.phone,
+        apartmentId: maintenance.apartment,
         invoiceNumber: `INV-M-${Date.now()}`,
         amount: maintenance.cost,
         dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // Due in 14 days

@@ -28,14 +28,10 @@ export const getPayments = async (req: Request, res: Response, next: NextFunctio
     let query = Payment.find(JSON.parse(queryStr))
       .populate({
         path: 'invoice',
-        select: 'invoiceNumber amount dueDate status',
+        select: 'invoiceNumber amount dueDate status tenantName apartmentId',
         populate: {
-          path: 'contract',
-          select: 'tenant.name',
-          populate: {
-            path: 'apartment',
-            select: 'number location'
-          }
+          path: 'apartmentId',
+          select: 'number location'
         }
       });
 
@@ -101,14 +97,10 @@ export const getPayment = async (req: Request, res: Response, next: NextFunction
     const payment = await Payment.findById(req.params.id)
       .populate({
         path: 'invoice',
-        select: 'invoiceNumber amount dueDate status description',
+        select: 'invoiceNumber amount dueDate status description tenantName tenantPhone apartmentId',
         populate: {
-          path: 'contract',
-          select: 'tenant.name tenant.phone',
-          populate: {
-            path: 'apartment',
-            select: 'number location level'
-          }
+          path: 'apartmentId',
+          select: 'number location level'
         }
       });
 

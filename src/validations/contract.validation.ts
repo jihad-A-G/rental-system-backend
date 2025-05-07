@@ -12,10 +12,10 @@ export const contractValidation = {
       .notEmpty().withMessage('Tenant phone is required')
       .isString().withMessage('Tenant phone must be a string'),
     body('tenant.idImagePath')
-      .notEmpty().withMessage('Tenant ID image is required')
+      .optional()
       .isString().withMessage('Tenant ID image path must be a string'),
     body('contractFile')
-      .notEmpty().withMessage('Contract file is required')
+      .optional()
       .isString().withMessage('Contract file path must be a string'),
     body('duration')
       .notEmpty().withMessage('Contract duration is required')
