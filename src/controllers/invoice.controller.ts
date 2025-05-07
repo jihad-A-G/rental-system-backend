@@ -252,4 +252,87 @@ export const getInvoicesByApartment = async (req: Request, res: Response, next: 
   } catch (error) {
     next(error);
   }
+};
+
+// @desc    Pay an invoice (create payment and update invoice)
+// @route   POST /api/invoices/:id/pay
+// @access  Private
+export const payInvoice = async (req: Request, res: Response, next: NextFunction) => {
+  const session = await Invoice.startSession();
+  session.startTransaction();
+  try {
+    const invoiceId = req.params.id;
+    const { amount, paymentMethod = 'Cash', description = 'Rent Payment', paymentDate } = req.body;
+
+    // Validate invoice
+    const invoice = await Invoice.findById(invoiceId).session(session);
+    if (!invoice) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new ErrorResponse(`Invoice not found with id of ${invoiceId}`, 404));
+    }
+
+    // Check if invoice is already fully paid
+    if (invoice.paidAmount >= invoice.amount) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new ErrorResponse('Invoice is already fully paid', 400));
+    }
+
+    // Validate amount
+    if (!amount || typeof amount !== 'number' || amount <= 0) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new ErrorResponse('Payment amount must be greater than 0', 400));
+    }
+    const remainingAmount = invoice.amount - invoice.paidAmount;
+    if (amount > remainingAmount) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new ErrorResponse(`Payment amount cannot exceed remaining amount of ${remainingAmount}`, 400));
+    }
+
+    // Create payment
+    const Payment = require('../models/payment.model').default;
+    const payment = await Payment.create([
+      {
+        invoice: invoice._id,
+        amount,
+        paymentMethod,
+        description,
+        paymentDate: paymentDate || new Date(),
+        receiptNumber: `RCPT-${Date.now()}`
+      }
+    ], { session });
+
+    // Update invoice
+    const newPaidAmount = invoice.paidAmount + amount;
+    let newStatus = invoice.status;
+    if (newPaidAmount >= invoice.amount) {
+      newStatus = 'Paid';
+    } else if (newPaidAmount > 0) {
+      newStatus = 'Partially Paid';
+    }
+    invoice.paidAmount = newPaidAmount;
+    invoice.status = newStatus;
+    await invoice.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    // Populate payments for response
+    const updatedInvoice = await Invoice.findById(invoiceId).populate('payments');
+
+    res.status(201).json({
+      success: true,
+      data: {
+        invoice: updatedInvoice,
+        payment: payment[0]
+      }
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    next(error);
+  }
 }; 
